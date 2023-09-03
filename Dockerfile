@@ -14,8 +14,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 5153
 
 # Set environment variables
-ENV DB_USERNAME=myrepo
-ENV DB_PASSWORD=j5JfgUqPmF
+ENV DB_USERNAME=my-app
+ENV DB_PASSWORD=cuJh8nFNbS
 ENV DB_HOST=your_db_host
 ENV DB_PORT=your_db_port
 ENV DB_NAME=your_db_name
