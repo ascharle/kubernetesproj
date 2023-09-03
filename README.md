@@ -30,55 +30,58 @@ I set up a Postgres database using a Helm Chart as follows:
 
 Set up Bitnami Repo:
 
-helm repo add bitnami https://charts.bitnami.com/bitnami
+```helm repo add bitnami https://charts.bitnami.com/bitnami```
 
 
-helm install coworking-space-db bitnami/postgresql
+```helm install coworking-space-db bitnami/postgresql```
+
 This command sets up a Postgre deployment at coworking-space-db-postgresql.default.svc.cluster.local in the Kubernetes cluster. I verified it by running kubectl get svc.
 
 Retrieve the password:
 
-export POSTGRES_PASSWORD=$(kubectl get secret --namespace default coworking-space-db-postgresql -o jsonpath="{.data.postgresql-password}" | base64 -d)
-echo $POSTGRES_PASSWORD
+```export POSTGRES_PASSWORD=$(kubectl get secret --namespace default coworking-space-db-postgresql -o jsonpath="{.data.postgresql-password}" | base64 -d)```
+```echo $POSTGRES_PASSWORD```
 Test Database Connection
 The database is accessible within the cluster, so there might be issues connecting to it via the local environment. I connected to a pod that has access to the cluster as follows:
 
 Connect Via a Pod:
-kubectl exec -it <POD_NAME> bash
-PGPASSWORD="<PASSWORD HERE>" psql postgres://postgres@coworking-space-db:5432/postgres -c <COMMAND_HERE>
+```kubectl exec -it <POD_NAME> bash
+PGPASSWORD="<PASSWORD HERE>" psql postgres://postgres@coworking-space-db:5432/postgres -c <COMMAND_HERE>````
 Run Seed Files
 I ran the seed files in the db/ directory to create the tables and populate them with data:
 
-kubectl port-forward --namespace default svc/coworking-space-db-postgresql 5432:5432 &
-PGPASSWORD="$POSTGRES_PASSWORD" psql --host 127.0.0.1 -U postgres -d postgres -p 5432 < <FILE_NAME.sql>
+```kubectl port-forward --namespace default svc/coworking-space-db-postgresql 5432:5432 &
+PGPASSWORD="$POSTGRES_PASSWORD" psql --host 127.0.0.1 -U postgres -d postgres -p 5432 < <FILE_NAME.sql>```
 Running the Analytics Application Locally
 In the analytics/ directory:
 
 Install dependencies:
-pip install -r requirements.txt
+```pip install -r requirements.txt```
 Run the application:
 
-DB_USERNAME=postgres DB_PASSWORD=$POSTGRES_PASSWORD python app.py
+```DB_USERNAME=postgres DB_PASSWORD=$POSTGRES_PASSWORD python app.py```
 Verifying The Application
 Generate a report for check-ins grouped by dates:
 
-curl <BASE_URL>/api/reports/daily_usage
+```curl <BASE_URL>/api/reports/daily_usage```
 Generate a report for check-ins grouped by users:
 
-
-curl <BASE_URL>/api/reports/user_visits
+```curl <BASE_URL>/api/reports/user_visits```
 Deployment
 I created a Docker image of the application and pushed it to AWS ECR. Then, I created Kubernetes deployment and service configuration files and applied them to the EKS cluster.
 
 Build and push the Docker image:
 
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com
-docker build -t coworking-space-analytics .
-docker tag coworking-space-analytics:latest <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/coworking-space-analytics:latest
-docker push <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/coworking-space-analytics:latest
+```aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com```
+
+```docker build -t coworking-space-analytics .```
+
+```docker tag coworking-space-analytics:latest <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/coworking-space-analytics:latest
+docker push <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/coworking-space-analytics:latest```
+
 Create Kubernetes deployment and service configuration files:
 
-deployment.yaml:
+```deployment.yaml:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -113,10 +116,10 @@ spec:
         - name: DB_NAME
           value: "postgres"
         - name: APP_PORT
-          value: "5153"
-service.yaml:
+          value: "5153" ```
 
-yaml
+service.yaml:
+```
 apiVersion: v1
 kind: Service
 metadata:
@@ -130,19 +133,21 @@ spec:
       targetPort: 5153
   type: LoadBalancer
 Apply the configuration files to the EKS cluster:
+```
 
-
-kubectl apply -f deployment.yaml
-kubectl apply -f service.yaml
+```kubectl apply -f deployment.yaml```
+```kubectl apply -f service.yaml```
 Verify the deployment and service:
 
 
-kubectl get deployments
-kubectl get services
-Conclusion
+```kubectl get deployments```
+```kubectl get services```
+
+###Conclusion
+
 The Coworking Space Service is now deployed and running on AWS EKS. The analytics API can be accessed via the LoadBalancer URL, and it provides business analysts with basic analytics data on user activity in the coworking space service.
 
-Stand-Out Suggestions
+### Stand-Out Suggestions
 
 Specify Reasonable Memory and CPU Allocation in the Kubernetes Deployment Configuration
 
