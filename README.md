@@ -31,7 +31,7 @@ I set up a Postgres database using a Helm Chart as follows:
 Set up Bitnami Repo:
 
 helm repo add bitnami https://charts.bitnami.com/bitnami
-Install PostgreSQL Helm Chart:
+
 
 helm install coworking-space-db bitnami/postgresql
 This command sets up a Postgre deployment at coworking-space-db-postgresql.default.svc.cluster.local in the Kubernetes cluster. I verified it by running kubectl get svc.
@@ -71,16 +71,13 @@ javascript
 Copy code
 curl <BASE_URL>/api/reports/daily_usage
 Generate a report for check-ins grouped by users:
-javascript
-Copy code
+
 curl <BASE_URL>/api/reports/user_visits
 Deployment
 I created a Docker image of the application and pushed it to AWS ECR. Then, I created Kubernetes deployment and service configuration files and applied them to the EKS cluster.
 
 Build and push the Docker image:
 
-css
-Copy code
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com
 docker build -t coworking-space-analytics .
 docker tag coworking-space-analytics:latest <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/coworking-space-analytics:latest
@@ -144,13 +141,12 @@ spec:
   type: LoadBalancer
 Apply the configuration files to the EKS cluster:
 
-Copy code
+
 kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
 Verify the deployment and service:
 
-arduino
-Copy code
+
 kubectl get deployments
 kubectl get services
 Conclusion
@@ -159,12 +155,10 @@ The Coworking Space Service is now deployed and running on AWS EKS. The analytic
 Stand-Out Suggestions
 
 Specify Reasonable Memory and CPU Allocation in the Kubernetes Deployment Configuration
+
 It is important to specify reasonable memory and CPU allocation in the Kubernetes deployment configuration to ensure the application runs efficiently. For this application, I recommend using the AWS t2.micro instance type as it provides a balance between compute power and cost.
 
 Save on Costs
 To save on costs, consider the following suggestions:
 
 Use Spot Instances: AWS Spot Instances allow you to use spare EC2 computing capacity at a potentially
-
-
-
