@@ -3,7 +3,7 @@ version: 0.2
 env:
   variables:
     IMAGE_REPO_NAME: "final-app"
-    IMAGE_TAG: latest
+    IMAGE_TAG: "latest"
 
 phases:
   pre_build:
