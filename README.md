@@ -44,33 +44,27 @@ Test Database Connection
 The database is accessible within the cluster, so there might be issues connecting to it via the local environment. I connected to a pod that has access to the cluster as follows:
 
 Connect Via a Pod:
-bash
-Copy code
 kubectl exec -it <POD_NAME> bash
 PGPASSWORD="<PASSWORD HERE>" psql postgres://postgres@coworking-space-db:5432/postgres -c <COMMAND_HERE>
 Run Seed Files
 I ran the seed files in the db/ directory to create the tables and populate them with data:
 
-arduino
-Copy code
 kubectl port-forward --namespace default svc/coworking-space-db-postgresql 5432:5432 &
 PGPASSWORD="$POSTGRES_PASSWORD" psql --host 127.0.0.1 -U postgres -d postgres -p 5432 < <FILE_NAME.sql>
 Running the Analytics Application Locally
 In the analytics/ directory:
 
 Install dependencies:
-Copy code
 pip install -r requirements.txt
 Run the application:
-bash
-Copy code
+
 DB_USERNAME=postgres DB_PASSWORD=$POSTGRES_PASSWORD python app.py
 Verifying The Application
 Generate a report for check-ins grouped by dates:
-javascript
-Copy code
+
 curl <BASE_URL>/api/reports/daily_usage
 Generate a report for check-ins grouped by users:
+
 
 curl <BASE_URL>/api/reports/user_visits
 Deployment
@@ -85,9 +79,6 @@ docker push <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/coworking-space-analyti
 Create Kubernetes deployment and service configuration files:
 
 deployment.yaml:
-
-yaml
-Copy code
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -126,7 +117,6 @@ spec:
 service.yaml:
 
 yaml
-Copy code
 apiVersion: v1
 kind: Service
 metadata:
